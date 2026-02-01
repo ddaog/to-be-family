@@ -71,9 +71,9 @@ export const Deck = ({ topic, onBack }: DeckProps) => {
                 </div>
                 <button
                     onClick={() => setCurrentIndex(topic.questions.length)}
-                    className="text-stone-400 hover:text-stone-900 transition-colors text-xs font-semibold uppercase tracking-wider border border-stone-200 px-3 py-1.5 rounded-full hover:bg-white hover:shadow-sm"
+                    className="text-stone-400 hover:text-stone-900 transition-colors text-xs font-semibold uppercase tracking-wider border border-stone-200 px-3 py-1.5 rounded-full hover:bg-white hover:shadow-sm whitespace-nowrap"
                 >
-                    Finish
+                    중간 점검
                 </button>
             </div>
 
@@ -96,6 +96,7 @@ export const Deck = ({ topic, onBack }: DeckProps) => {
                             active={index === currentIndex}
                             colorString={topic.color}
                             onVote={() => { }}
+                            promise={promises.find(p => p.questionId === q.id)?.text}
                         />
                     )
                 ))}

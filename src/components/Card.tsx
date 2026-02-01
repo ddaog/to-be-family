@@ -1,16 +1,17 @@
 import { motion } from 'framer-motion';
 import type { Question } from '../data/topics';
 import { cn } from '../lib/utils';
-import { MessageCircleHeart, Sparkles } from 'lucide-react';
+import { MessageCircleHeart } from 'lucide-react';
 
 interface CardProps {
     question: Question;
     active: boolean;
     onVote: (direction: 'left' | 'right') => void; // For future Tinder-like mechanics if needed, currently just next/prev
     colorString: string; // Tailwinc class string e.g. "bg-rose-100"
+    promise?: string;
 }
 
-export const Card = ({ question, active, colorString }: CardProps) => {
+export const Card = ({ question, active, colorString, promise }: CardProps) => {
     return (
         <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -36,22 +37,41 @@ export const Card = ({ question, active, colorString }: CardProps) => {
             <div className={cn("absolute inset-0 opacity-30 rounded-3xl bg-gradient-to-br from-transparent to-white/50", colorString)} />
 
             {/* Content */}
-            <div className="relative z-10 flex flex-col h-full items-center text-center justify-center">
-                <div className="mb-6 animate-fade-in">
-                    <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-sm mb-4">
-                        <Sparkles className="w-6 h-6 text-stone-400" />
+            <div className="relative z-10 flex flex-col h-full items-center text-center justify-center p-4">
+                <div className="mb-6">
+                    <span className="inline-block px-3 py-1 rounded-full bg-white/60 text-stone-600 text-xs font-semibold tracking-wider backdrop-blur-sm border border-stone-100/50 uppercase">
+                        {question.category}
                     </span>
-                    <p className="text-xs font-semibold tracking-widest text-stone-500 uppercase">{question.category}</p>
                 </div>
 
-                <h2 className="text-2xl md:text-3xl font-serif font-medium text-stone-800 leading-tight mb-4">
+                <h3 className="text-2xl font-serif text-stone-800 leading-relaxed mb-4 font-medium break-keep">
                     {question.text}
-                </h2>
+                </h3>
 
                 {question.subText && (
-                    <p className="text-stone-500 font-light leading-relaxed max-w-[260px]">
+                    <p className="text-stone-500 text-sm font-light leading-relaxed max-w-xs break-keep">
                         {question.subText}
                     </p>
+                )}
+
+                {/* Promise Note Display */}
+                {promise && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-8 relative w-full"
+                    >
+                        <div className="absolute inset-0 bg-yellow-100/50 blur transform -rotate-1 rounded-lg"></div>
+                        <div className="relative bg-white/90 p-4 rounded-xl shadow-sm border border-yellow-100/50 backdrop-blur-sm text-left">
+                            <div className="flex items-center gap-1.5 mb-1.5 text-amber-500">
+                                <MessageCircleHeart className="w-3.5 h-3.5" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">My Promise</span>
+                            </div>
+                            <p className="text-stone-700 text-sm font-medium line-clamp-3 italic">
+                                "{promise}"
+                            </p>
+                        </div>
+                    </motion.div>
                 )}
             </div>
 

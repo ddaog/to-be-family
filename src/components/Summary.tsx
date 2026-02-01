@@ -13,6 +13,34 @@ export const Summary = ({ topic, promises, onHome }: SummaryProps) => {
         return promises.find(p => p.questionId === qId)?.text;
     };
 
+    const handleShare = async () => {
+        const textToShare = `[TO BE FAMILY: 가족이 되어가는 시간]
+        
+'${topic.title}' 대화 기록입니다.
+
+${promises.map(p => {
+            const q = topic.questions.find(q => q.id === p.questionId);
+            return `Q. ${q?.text}\nA. ${p.text}`;
+        }).join('\n\n')}
+
+더 많은 대화 나누기: https://to-be-family.vercel.app`;
+
+        try {
+            if (navigator.share) {
+                await navigator.share({
+                    title: 'TO BE FAMILY 대화 기록',
+                    text: textToShare,
+                    url: 'https://to-be-family.vercel.app'
+                });
+            } else {
+                await navigator.clipboard.writeText(textToShare);
+                alert('대화 내용이 복사되었습니다! 카카오톡을 열어 붙여넣기 해주세요.');
+            }
+        } catch (error) {
+            console.error('Error sharing:', error);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-stone-50 px-6 py-12 flex flex-col items-center">
             <motion.div
@@ -23,7 +51,7 @@ export const Summary = ({ topic, promises, onHome }: SummaryProps) => {
                 <div className="inline-flex items-center justify-center p-3 bg-stone-900 text-white rounded-full mb-6 shadow-lg">
                     <Check className="w-6 h-6" />
                 </div>
-                <h1 className="text-3xl font-serif text-stone-900 mb-2">대화 완료</h1>
+                <h1 className="text-3xl font-serif text-stone-900 mb-2">중간 점검</h1>
                 <p className="text-stone-500">
                     <span className="font-semibold text-stone-800">{topic.title}</span>에 대한<br />
                     우리의 약속들이에요.
@@ -66,11 +94,11 @@ export const Summary = ({ topic, promises, onHome }: SummaryProps) => {
                     처음으로
                 </button>
                 <button
-                    className="flex-[2] flex items-center justify-center gap-2 bg-stone-900 text-white py-4 rounded-xl font-medium shadow-lg hover:bg-stone-800 transition-colors"
-                    onClick={() => alert("공유 기능은 준비 중입니다!")}
+                    className="flex-[2] flex items-center justify-center gap-2 bg-[#FEE500] text-[#3c1e1e] py-4 rounded-xl font-medium shadow-lg hover:bg-[#FDD835] transition-colors"
+                    onClick={handleShare}
                 >
                     <Share2 className="w-4 h-4" />
-                    이미지로 저장하기
+                    카카오톡으로 결과 보내기
                 </button>
             </div>
         </div>
