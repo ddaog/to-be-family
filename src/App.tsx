@@ -1,10 +1,17 @@
 import { useState } from 'react';
 import { topics, type TopicPack } from './data/topics';
 import { Deck } from './components/Deck';
+import { Onboarding } from './components/Onboarding';
+import { useLocalStorage } from './hooks/useLocalStorage';
 import { Sparkles, Heart } from 'lucide-react';
 
 function App() {
   const [selectedTopic, setSelectedTopic] = useState<TopicPack | null>(null);
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useLocalStorage('kajokey-onboarding-seen', false);
+
+  if (!hasSeenOnboarding) {
+    return <Onboarding onComplete={() => setHasSeenOnboarding(true)} />;
+  }
 
   if (selectedTopic) {
     return <Deck topic={selectedTopic} onBack={() => setSelectedTopic(null)} />;
@@ -17,7 +24,7 @@ function App() {
           <span className="bg-stone-900 text-white p-1 rounded">
             <Heart className="w-4 h-4" fill="currentColor" />
           </span>
-          <span className="font-bold tracking-tight text-stone-900">KAJOKEY</span>
+          <span className="font-bold tracking-tight text-stone-900">TO BE FAMILY</span>
         </div>
         <h1 className="text-4xl font-serif text-stone-900 leading-tight mb-4">
           오늘은 어떤 이야기를<br />
@@ -54,7 +61,7 @@ function App() {
       </main>
 
       <footer className="mt-auto pt-12 text-center text-xs text-stone-300">
-        © 2026 Kajokey. For your precious moments.
+        © 2026 TO BE FAMILY. For your precious moments.
       </footer>
     </div>
   );
