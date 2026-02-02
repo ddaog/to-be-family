@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Check, Home, Share2 } from 'lucide-react';
 import type { TopicPack } from '../data/topics';
+import LZString from 'lz-string';
 
 interface SummaryProps {
     topic: TopicPack;
@@ -14,6 +15,14 @@ export const Summary = ({ topic, promises, onHome }: SummaryProps) => {
     };
 
     const handleShare = async () => {
+        // Encode data for URL
+        const data = JSON.stringify({
+            topicId: topic.id,
+            promises
+        });
+        const compressed = LZString.compressToEncodedURIComponent(data);
+        const shareUrl = `https://to-be-family.vercel.app/result?data=${compressed}`;
+
         const textToShare = `[TO BE FAMILY: 가족이 되어가는 시간]
         
 '${topic.title}' 대화 기록입니다.
@@ -23,18 +32,19 @@ ${promises.map(p => {
             return `Q. ${q?.text}\nA. ${p.text}`;
         }).join('\n\n')}
 
-더 많은 대화 나누기: https://to-be-family.vercel.app`;
+🔗 결과 페이지 보기:
+${shareUrl}`;
 
         try {
             if (navigator.share) {
                 await navigator.share({
                     title: 'TO BE FAMILY 대화 기록',
                     text: textToShare,
-                    url: 'https://to-be-family.vercel.app'
+                    url: shareUrl
                 });
             } else {
                 await navigator.clipboard.writeText(textToShare);
-                alert('대화 내용이 복사되었습니다! 카카오톡을 열어 붙여넣기 해주세요.');
+                alert('대화 내용과 결과 링크가 복사되었습니다!');
             }
         } catch (error) {
             console.error('Error sharing:', error);

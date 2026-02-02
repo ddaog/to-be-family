@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import type { Question } from '../data/topics';
 import { cn } from '../lib/utils';
@@ -11,7 +12,9 @@ interface CardProps {
     promise?: string;
 }
 
-export const Card = ({ question, active, colorString, promise }: CardProps) => {
+export const Card = ({ question, active, colorString, promise, onVote }: CardProps) => {
+    const [exitX, setExitX] = useState<number | null>(null);
+
     return (
         <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -20,6 +23,19 @@ export const Card = ({ question, active, colorString, promise }: CardProps) => {
                 opacity: active ? 1 : 0.4,
                 y: active ? 0 : -20,
                 rotate: active ? 0 : -2
+            }}
+            exit={exitX ? { x: exitX, opacity: 0, rotate: exitX > 0 ? 20 : -20 } : { opacity: 0, scale: 0.95 }}
+            drag={active ? "x" : false}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.7}
+            onDragEnd={(_, info) => {
+                if (info.offset.x > 100) {
+                    setExitX(500);
+                    onVote('right');
+                } else if (info.offset.x < -100) {
+                    setExitX(-500);
+                    onVote('left');
+                }
             }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className={cn(

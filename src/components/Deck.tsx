@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { TopicPack } from '../data/topics';
 import { Card } from './Card';
 import { PromiseNote } from './PromiseNote';
-import { Summary } from './Summary';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { ChevronRight, ChevronLeft, PenLine } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import LZString from 'lz-string';
 
 interface DeckProps {
     topic: TopicPack;
@@ -21,11 +22,22 @@ export const Deck = ({ topic, onBack }: DeckProps) => {
         `kajokey-promises-${topic.id}`,
         []
     );
+    const navigate = useNavigate();
+
+    const handleFinish = () => {
+        const data = JSON.stringify({
+            topicId: topic.id,
+            promises
+        });
+        const compressed = LZString.compressToEncodedURIComponent(data);
+        navigate(`/result?data=${compressed}`);
+    };
 
     const nextCard = () => {
-        // Allow going one step past the last card to trigger Summary
-        if (currentIndex < topic.questions.length) {
+        if (currentIndex < topic.questions.length - 1) {
             setCurrentIndex(prev => prev + 1);
+        } else {
+            handleFinish();
         }
     };
 
@@ -51,9 +63,9 @@ export const Deck = ({ topic, onBack }: DeckProps) => {
         // Optional: log for debugging or analytics
     }, [promises]);
 
-    // Show summary if completed
+    // Redirecting handling handled by nextCard logic triggering handleFinish
     if (currentIndex >= topic.questions.length) {
-        return <Summary topic={topic} promises={promises} onHome={onBack} />;
+        return null;
     }
 
     return (
@@ -70,7 +82,7 @@ export const Deck = ({ topic, onBack }: DeckProps) => {
                     </span>
                 </div>
                 <button
-                    onClick={() => setCurrentIndex(topic.questions.length)}
+                    onClick={handleFinish}
                     className="text-stone-400 hover:text-stone-900 transition-colors text-xs font-semibold uppercase tracking-wider border border-stone-200 px-3 py-1.5 rounded-full hover:bg-white hover:shadow-sm whitespace-nowrap"
                 >
                     중간 점검
@@ -88,18 +100,20 @@ export const Deck = ({ topic, onBack }: DeckProps) => {
 
             {/* Card Deck Area */}
             <div className="relative w-full max-w-md h-[60vh] flex justify-center items-center perspective-1000">
-                {topic.questions.map((q, index) => (
-                    index >= currentIndex && (
-                        <Card
-                            key={q.id}
-                            question={q}
-                            active={index === currentIndex}
-                            colorString={topic.color}
-                            onVote={() => { }}
-                            promise={promises.find(p => p.questionId === q.id)?.text}
-                        />
-                    )
-                ))}
+                <AnimatePresence>
+                    {topic.questions.map((q, index) => (
+                        index >= currentIndex && (
+                            <Card
+                                key={q.id}
+                                question={q}
+                                active={index === currentIndex}
+                                colorString={topic.color}
+                                onVote={() => nextCard()}
+                                promise={promises.find(p => p.questionId === q.id)?.text}
+                            />
+                        )
+                    ))}
+                </AnimatePresence>
                 {currentIndex >= topic.questions.length && (
                     <div className="text-center p-8">
                         <h2 className="text-2xl font-serif text-stone-800 mb-4">대화 완료!</h2>
