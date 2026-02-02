@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Home } from './pages/Home';
+import { DeckPage } from './pages/DeckPage';
 import { ResultPage } from './pages/ResultPage';
 
 function App() {
