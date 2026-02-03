@@ -109,6 +109,7 @@ export const Deck = ({ topic, onBack }: DeckProps) => {
                                 active={index === currentIndex}
                                 colorString={topic.color}
                                 onVote={() => nextCard()}
+                                onEdit={() => setIsNoteOpen(true)}
                                 promise={promises.find(p => p.questionId === q.id)?.text}
                             />
                         )

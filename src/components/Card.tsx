@@ -7,12 +7,13 @@ import { MessageCircleHeart } from 'lucide-react';
 interface CardProps {
     question: Question;
     active: boolean;
-    onVote: (direction: 'left' | 'right') => void; // For future Tinder-like mechanics if needed, currently just next/prev
-    colorString: string; // Tailwinc class string e.g. "bg-rose-100"
+    onVote: (direction: 'left' | 'right') => void;
+    onEdit: () => void;
+    colorString: string;
     promise?: string;
 }
 
-export const Card = ({ question, active, colorString, promise, onVote }: CardProps) => {
+export const Card = ({ question, active, colorString, promise, onVote, onEdit }: CardProps) => {
     const [exitX, setExitX] = useState<number | null>(null);
 
     return (
@@ -23,6 +24,9 @@ export const Card = ({ question, active, colorString, promise, onVote }: CardPro
                 opacity: active ? 1 : 0.4,
                 y: active ? 0 : -20,
                 rotate: active ? 0 : -2
+            }}
+            onClick={() => {
+                if (active) onEdit();
             }}
             exit={exitX ? { x: exitX, opacity: 0, rotate: exitX > 0 ? 20 : -20 } : { opacity: 0, scale: 0.95 }}
             drag={active ? "x" : false}
